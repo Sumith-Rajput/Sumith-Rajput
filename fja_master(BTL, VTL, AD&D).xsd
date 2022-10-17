@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="fja">
+        <xs:complexType>
+                <xs:sequence>
+                    <xs:element name="transaction" type="Transaction" minOccurs="1" />
+                </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="Transaction">
+        <xs:annotation>
+                <xs:documentation>To generate benefit summary reports</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+                <xs:element name="dataModel" type="xs:string" minOccurs="0"/>
+                <xs:element name="metadata" type="MetaData"/>
+                <xs:element name="document" type="Document"/>
+			    <xs:element name="sender" type="Sender" minOccurs="0" />
+                <xs:element name="recipients" type="RecipientList" minOccurs="0" />
+                <xs:element name="summaryOfBenefits" type="SUMMARY_OF_BENEFIT" minOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="MetaData">
+        <xs:annotation>
+                <xs:documentation>Meta data of the document</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="documentSubclass" type="xs:string"/>
+            <xs:element name="opportunityId" type="xs:string"/>
+            <xs:element name="packageId" type="xs:string"/>
+            <xs:element name="requestId" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="Document">
+        <xs:sequence>
+            <xs:element name="templateName" type="xs:string"/>
+            <xs:element name="templateID" type="xs:string" minOccurs="0"/>
+            <xs:element name="transactGUID" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>GUID to track transaction</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="subjectArea" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>For CIC logic</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RecipientList">
+		<xs:sequence minOccurs="0">
+			<xs:element name="primaryRecipient" type="Recipient" minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="ccRecipient" type="Recipient" minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="Recipient">
+		<xs:sequence minOccurs="0">
+			<xs:element name="general" type="PersonBasic" minOccurs="0" />
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="companyName" type="xs:string" minOccurs="0" />
+			<xs:element name="contact" type="Contact" minOccurs="0" />
+			<xs:element name="channels" type="Channel" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="Channel">
+		<xs:sequence minOccurs="0">
+			<xs:element name="localPrint" type="xs:boolean" minOccurs="0" />
+			<xs:element name="postal" type="xs:boolean" minOccurs="0" />
+			<xs:element name="email" type="xs:boolean" minOccurs="0" />
+			<xs:element name="secureEmail" type="xs:boolean" minOccurs="0" />
+			<xs:element name="fax" type="xs:boolean" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+    
+    <xs:complexType name="SUMMARY_OF_BENEFIT">
+		<xs:sequence>
+            <xs:element name="lineOfBusiness" type="PRODUCT_CONFIGURATION" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="PRODUCT_CONFIGURATION">
+        <xs:sequence>
+            <xs:element name="productCode" type="xs:string" minOccurs="0" />
+            <xs:element name="rates" type="RATES" minOccurs="0" />
+            <xs:element name="rateModal" type="RATE_MODAL" minOccurs="0" />
+			<xs:element name="case" type="CASE" minOccurs="0" />
+            <xs:element name="eligibleClass" type="ELIGIBLE_CLASS" minOccurs="0" />
+            <xs:element name="planDesign" type="PLAN_DESIGN" minOccurs="0" />
+            <xs:element name="coverage" type="COVERAGE" minOccurs="0" />
+            <xs:element name="rounding" type="ROUNDING" minOccurs="0" />
+            <xs:element name="plan" type="PLAN" minOccurs="0" />
+            <xs:element name="rateStructure" type="RATE_STRUCTURE" minOccurs="0" />
+            <xs:element name="addCoveredLossesModal" type="ADD_COVERED_LOSSES_MODAL" minOccurs="0" />
+            <xs:element name="planSummary" type="PLAN_SUMMARY" minOccurs="0" />
+            <xs:element name="copyRights" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ADD_COVERED_LOSSES_MODAL">
+        <xs:sequence>
+            <xs:element name="addCoveredLosses" type="xs:string" minOccurs="0" />
+            <xs:element name="coveredLossBenefitPercentage" type="xs:string" minOccurs="0" />
+            <xs:element name="addTypes" type="ADD_TYPES" minOccurs="0" />
+            <xs:element name="addBenefitPercentage" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ADD_TYPES">
+        <xs:sequence>
+            <xs:element name="addType1" type="xs:string" minOccurs="0" />
+            <xs:element name="addType2" type="xs:string" minOccurs="0" />
+            <xs:element name="addType3" type="xs:string" minOccurs="0" />
+            <xs:element name="addType4" type="xs:string" minOccurs="0" />
+            <xs:element name="addType5" type="xs:string" minOccurs="0" />
+            <xs:element name="addType6" type="xs:string" minOccurs="0" />
+            <xs:element name="addType7" type="xs:string" minOccurs="0" />
+            <xs:element name="addType8" type="xs:string" minOccurs="0" />
+            <xs:element name="addType9" type="xs:string" minOccurs="0" />
+            <xs:element name="addType10" type="xs:string" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PLAN_SUMMARY">
+        <xs:sequence>
+            <xs:element type="xs:string" name="product" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+
+	<xs:complexType name="CASE">
+        <xs:sequence>
+            <xs:element type="xs:string" name="accountName" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="ELIGIBLE_CLASS">
+        <xs:sequence>
+            <xs:element type="xs:string" name="locationName" minOccurs="0" />
+            <xs:element type="xs:string" name="className" minOccurs="0" />
+            <xs:element type="xs:string" name="classDescription" minOccurs="0" />
+            <xs:element type="xs:string" name="eligibilityWaitingPeriod" minOccurs="0" />
+            <xs:element type="xs:string" name="eligibilityWaitingPeriodDays" minOccurs="0" />
+            <xs:element type="xs:string" name="eligibilityWaitingPeriodMonths" minOccurs="0" />
+            <xs:element type="xs:string" name="eligibilityWaitingPeriodOther" minOccurs="0" />
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="PLAN_DESIGN">
+        <xs:sequence>
+            <xs:element name="eligibilityWaitingPeriod" type="xs:string" minOccurs="0"/>
+            <xs:element name="eligibilityWaitingPeriodDays" type="xs:string" minOccurs="0"/>
+            <xs:element name="eligibilityWaitingPeriodMonths" type="xs:string" minOccurs="0"/>
+            <xs:element name="eligibilityWaitingPeriodOther" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependentCoverage" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependentEligibility" type="xs:string" minOccurs="0"/>
+            <xs:element name="domesticPartnerEligible" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseEligibleWithoutEE" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependentChildEligibleWithoutEE" type="xs:string" minOccurs="0"/>
+            <xs:element name="extendedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="extendedDeathBenefitMaximumDuration" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumDurationAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="extendedDeathBenefitDisabledBeforeAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisabilityDuration" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumDisabledBeforeAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumWaitingPeriod" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="flatDollarAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremium" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisability" type="xs:string" minOccurs="0"/>
+            <xs:element name="matchLifeBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageEndAtAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageEndAtAgeForFullTimeStudent" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageEndAtAgeForNotFullTimeStudent" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="COVERAGE">
+        <xs:sequence>
+            <xs:element name="benefitType" type="BENEFIT_TYPE" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="BENEFIT_TYPE">
+		<xs:sequence>
+			<xs:element name="coverage" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageType" type="xs:string" minOccurs="0"/>
+            <xs:element name="splitContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeSplitContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="adAndDRider" type="xs:string" minOccurs="0"/>
+            <xs:element name="lifeCoverageEndsAtAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="childBenfitBirthTo14Days" type="xs:string" minOccurs="0"/>
+            <xs:element name="childBenfit14DaysTo6Month" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageEndAtAgeForFullTimeStudent" type="xs:string" minOccurs="0"/>
+            <xs:element name="coverageEndAtAgeForNotFullTimeStudent" type="xs:string" minOccurs="0"/>
+            <xs:element name="benefitType" type="xs:string" minOccurs="0"/>
+            <xs:element name="flatBenefitAmount" type="FlatBenefitAmount" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="unitsOf" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeUnitsOf" type="xs:string" minOccurs="0"/>
+            <xs:element name="childUnitsOf" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseUnitsOf" type="xs:string" minOccurs="0"/>
+            <xs:element name="salaryMultiple" type="SalaryMultiple" minOccurs="0"/>
+            <xs:element name="earningType" type="xs:string" minOccurs="0"/>
+            <xs:element name="benefitMinimum" type="xs:string" minOccurs="0"/>
+            <xs:element name="benefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="guarateedIssueAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="guarateedIssueTimesSalary" type="xs:string" minOccurs="0"/>
+            <xs:element name="typeOfAnnualEntrollmentIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="unitsOfIncrease" type="xs:string" minOccurs="0"/>
+			<xs:element name="percentageOfBenefit" type="xs:string" minOccurs="0"/>
+			<xs:element name="percentageBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="benefitReductionSchedule" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseReductionAgeBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="acceleratedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseAcceleratedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="upToPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependentEligibility" type="xs:string" minOccurs="0"/>
+            <xs:element name="extendedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="adAndDRiderType" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="adAndDRiderBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="seatbelt" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonCarrier" type="xs:string" minOccurs="0"/>
+			<xs:element name="commonCarrierPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonCarrierMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssault" type="xs:string" minOccurs="0"/>
+			<xs:element name="feloniousAssaultPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssaultMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="seatbeltBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="seatbeltBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="seatbeltFlatAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="combinedTimesSalary" type="xs:string" minOccurs="0"/>
+            <xs:element name="combinedBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeBenefitType" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeTypeOfAnnualEnrollmentIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeUnitsIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseBenefitType" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseTypeOfAnnualEnrollmentIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseUnitsIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="benefitLevelIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeBenefitType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeTypeOfAnnualEnrollmentIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeBenefitLevelIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseBenefitLevelIncrease" type="xs:string" minOccurs="0"/>
+            <xs:element name="flatDollarAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeAcceleratedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="percentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="percentageContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseCompositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="childContributionPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeCompositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonCarrierFlatAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssaultFlatAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="airbagBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="airbagFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="childAccidentalInjuryFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="childDayCareBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="childDayCareFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="comaBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonCarrierBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonCarrierFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonDualAccidentalBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="commonDualAccidentalFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="dependentChildEligibleWithoutEE" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="exposureAndDisapperance" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssaultBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssaultFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="matchLifeBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="rehabilitationBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="rehabilitationFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="roundingRule" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB1AdditionalBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB2AdditionalBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB3ChildAdditionalBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="spUnitsOf" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseEligibleWithoutEEEnrollment" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseRetrainingBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseRetrainingFlat" type="xs:string" minOccurs="0"/>
+			<xs:element name="survivingSpouseBenefitPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="survivingSpouseFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="airbagBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="roundingAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="enhancedOption1Percentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="enhancedOption2Percentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="enhancedOption1BenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="enhancedOption2BenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="traditionalOptionWithChildrenPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="traditionalOptionWithNoChildPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="traditionalOptionWithSpousePercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB1AdditionalBenefitMax" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB1NumberOfYears" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB1NoQualifyingChildDollars" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB1ChildUnderAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB2AdditionalBenefitMax" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB2NumberOfYears" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB2NoQualifyingChildDollars" type="xs:string" minOccurs="0"/>
+            <xs:element name="SEB2ChildUnderAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="rehabilitationBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="childDayCareChildAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="childDayCareBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="childDayCareChildYears" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseRetrainingBenefitMaximum" type="xs:string" minOccurs="0"/>
+            <xs:element name="feloniousAssaultBenefitMaximum" type="xs:string" minOccurs="0"/>
+			<xs:element name="survivingSpouseBenefitMaximum" type="xs:string" minOccurs="0"/>
+			<xs:element name="survivingSpouseMonths" type="xs:string" minOccurs="0"/>
+			<xs:element name="commonDualAccidentBenefitPercentage" type="xs:string" minOccurs="0"/>
+			<xs:element name="commonDualAccidentBenefitMaximum" type="xs:string" minOccurs="0"/>
+			<xs:element name="commonDualAccidentFlat" type="xs:string" minOccurs="0"/>
+			<xs:element name="employeePerUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="employeeSplitPercentageContributionPerPaycheckUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="employeePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="spousePerUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="spouseSplitPercentageContributionPerPaycheckUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="childPerUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="childSplitPercentageContributionPerPaycheckUnitRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="payrollFrequency" type="xs:string" minOccurs="0"/>
+			<xs:element name="productVTLPolicyNumber" type="xs:string" minOccurs="0"/>
+			<xs:element name="vaddPolicyNumber" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="ROUNDING">
+        <xs:sequence>
+            <xs:element name="roundingRule" type="xs:string" minOccurs="0"/>
+            <xs:element name="roundingAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="roundingRuleAppliesTo" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="PLAN">
+        <xs:sequence>
+            <xs:element name="situsState" type="xs:string" minOccurs="0"/>
+            <xs:element name="product" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumDisabledBeforeAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumDuration" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumDurationAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremiumWaitingPeriod" type="xs:string" minOccurs="0"/>
+            <xs:element name="creationDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisabilityStartingAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisabilityDuration" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisabilityDurationMonths" type="xs:string" minOccurs="0"/>
+            <xs:element name="extendedDeathBenefit" type="xs:string" minOccurs="0"/>
+            <xs:element name="portabilityEligibility" type="xs:string" minOccurs="0"/>
+            <xs:element name="portabilityDuration" type="xs:string" minOccurs="0"/>
+            <xs:element name="portabilityDurationAge" type="xs:string" minOccurs="0"/>
+            <xs:element name="portabilityDurationYears" type="xs:string" minOccurs="0"/>
+            <xs:element name="conversionNoOfDaysToApply" type="xs:string" minOccurs="0"/>
+            <xs:element name="policyNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="documentGenerationDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="waiverOfPremium" type="xs:string" minOccurs="0"/>
+            <xs:element name="continuationOfDisability" type="xs:string" minOccurs="0"/>
+            <xs:element name="vaddPolicyNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="volLifePolicyNumber" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="RATE_STRUCTURE">
+        <xs:sequence>
+            <xs:element name="benefitType" type="xs:string" minOccurs="0"/>
+            <xs:element name="compositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="ageBandApplies" type="xs:string" minOccurs="0"/>
+            <xs:element name="smokerStatusApplies" type="xs:string" minOccurs="0"/>
+            <xs:element name="UnismokerRates" type="xs:string" minOccurs="0"/>
+            <xs:element name="payrollFrequency" type="xs:string" minOccurs="0"/>
+            <xs:element name="pasteFromSpreadSheet" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseContributionPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="contributionTypePercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="contributionTypeFlat" type="xs:string" minOccurs="0"/>
+            <xs:element name="childRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="childContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeSmokerRates" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeNonSmokerRates" type="xs:string" minOccurs="0"/>
+            <xs:element name="contributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="percentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="percentageContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseCompositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="childContributionPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyCompositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeContributionPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyContributionPercentage" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeCompositeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eechContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eespContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eechRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="eespRateBasis" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeSplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeeSplitContributionPercentagePerPaycheckPerTenThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="employeePerPaycheckPerTenThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="spousePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="spousePerPaycheckPerFiveThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseSplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="spouseSplitContributionPercentagePerPaycheckPerFiveThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="childPerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+			<xs:element name="childPerPaycheckPerTwoThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="childSplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="childSplitContributionPercentagePerPaycheckPerTwoThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="employeePerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="spousePerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="childPerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyPerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="eespPerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="eechPerPayFlatContribution" type="xs:string" minOccurs="0"/>
+            <xs:element name="eespPerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="eespSplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="eechPerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="eechSplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="familyPerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="familySplitContributionPercentagePerPaycheckPerThousandRate" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="RATES">
+        <xs:sequence>
+            <xs:element name="eeSplitContributionType" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+	<xs:complexType name="RATE_MODAL">
+        <xs:sequence>
+            <xs:element name="splitContributionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="eeSplitContributionType" type="xs:string" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:simpleType name="String10">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String40">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="40"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="String50">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="50"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:complexType name="FlatBenefitAmount">
+		<xs:sequence minOccurs="0">
+			<xs:element name="flatBenefitAmount1" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount2" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount3" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount4" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount5" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount6" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount7" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount8" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount9" type="xs:string" minOccurs="0" />
+			<xs:element name="flatBenefitAmount10" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="SalaryMultiple">
+		<xs:sequence minOccurs="0">
+			<xs:element name="salaryMultiple1" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple2" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple3" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple4" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple5" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple6" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple7" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple8" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple9" type="xs:string" minOccurs="0" />
+			<xs:element name="salaryMultiple10" type="xs:string" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+
+    <xs:complexType name="Sender">
+		<xs:sequence minOccurs="0">
+			<xs:element name="general" type="PersonBasic"
+						minOccurs="0" />
+			<xs:element name="contact" type="Contact" minOccurs="0" />
+			<xs:element name="underwritingCompany"
+						type="UnderwritingCompany" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+    
+	<xs:complexType name="PersonBasic">
+		<xs:sequence minOccurs="0">
+			<xs:element name="firstName" type="String50" minOccurs="0" />
+			<xs:element name="middleName" type="String10"
+						nillable="false" minOccurs="0" />
+			<xs:element name="lastName" type="String50" minOccurs="0" />
+			<xs:element name="prefix" type="String50" nillable="false"
+						minOccurs="0">
+			</xs:element>
+			<xs:element name="prefixNew" type="String50"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Title (Mr., Ms., Mrs., Dr. . . . ) associated
+						with message's recipient
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="designation" type="xs:string"
+						minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The designation of Ph.D, ESQ, DDS, etc.
+						indicating certifications or levels of achievement.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="suffix" type="String50" nillable="false"
+						minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Jr. Sr</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="jobTitle" type="String50"
+						nillable="false" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="Contact">
+		<xs:sequence minOccurs="0">
+			<xs:element name="address" type="Address" minOccurs="0" />
+			<xs:element name="email" type="Email" minOccurs="0" />
+			<xs:element name="fax" type="Fax" minOccurs="0" />
+			<xs:element name="phone" type="Phone" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="Address">
+		<xs:sequence minOccurs="0">
+			<xs:element name="addressL1" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 1</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressL2" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 2</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressL3" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 3</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressL4" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 4</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressL5" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 5</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="addressL6" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>address Line 6</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="city" type="String40" nillable="false"
+						minOccurs="0" />
+			<xs:element name="state" type="String40" nillable="false"
+						minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>state Or Province</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="zipCode" type="String40"
+						nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>postal Or ZipCode</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="country" type="String40"
+						default="United States" nillable="false" minOccurs="0" />
+			<xs:element name="countryCode" type="String40"
+						default="USA" nillable="false" minOccurs="0" />
+			<xs:element name="stateCode" type="String40" default="USA"
+						nillable="false" minOccurs="0" />
+			<xs:element name="canadaZip" type="String40" default="USA"
+						nillable="false" minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Email">
+		<xs:sequence minOccurs="0">
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="emailAddress" type="xs:string"
+						minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Fax">
+		<xs:sequence minOccurs="0">
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="faxNumber" type="xs:string"
+						minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="Phone">
+		<xs:sequence minOccurs="0">
+			<xs:element name="type" type="xs:string" minOccurs="0" />
+			<xs:element name="intCode" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>international code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="areaCode" type="xs:string" minOccurs="0" />
+			<xs:element name="phoneNumber" type="xs:string"
+						minOccurs="0" />
+			<xs:element name="extension" type="xs:string"
+						minOccurs="0" />
+		</xs:sequence>
+	</xs:complexType>
+    <xs:complexType name="UnderwritingCompany">
+		<xs:sequence>
+			<xs:element name="underwritingCompanyName"
+						type="xs:string" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
