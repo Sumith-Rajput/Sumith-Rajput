@@ -1,382 +1,626 @@
 %dw 2.0
+import * from dw::core::Strings
 output application/xml
 var packageResp = vars.packageResp
 var opportunityResp = vars.opportunityResp
+fun checkProduct(product: String) = 
+	if(product == "Basic Term Life") "BTL" else  
+	if(product == "Voluntary Term Life") "VTL" else "Not a Life Product(BTL/VTL)"
+
+fun checkCoverageType(covType: String) = 
+	if(covType == "Employee") "EE" else
+	if(covType == "Spouse") "SPS" else 
+	if(covType == "Child") "CH" else 
+	if(covType == "Family") "FAM" else "Invalid Coverage Type"
+	
+	
+fun checkSmoker(smokerType: String) = 
+	if(smokerType == "Smoker")
+		{
+			first: "First Element",
+			second: "Second element"
+		}
+	else
+		{
+			first: "First",
+			second: "Non SMoker"
+		}
+
 ---
 {
-    fja:
+    thunderhead:
     {
-        transaction: {
-            datamodel: "fja",
-            metadata: {
-            	documentSubclass: "CEM-SummaryOfBenefit",
-            	opportunityId: opportunityResp.opportunityId,
-            	packageId: packageResp.packageId,
-            	requestId: uuid()
-            },
-            document: {
-                templateName: "Benefit Summary Report",
-                templateID: 159124182,
-                transactGUID: "9a42aec4-0b17-49dc-894b-4adfb986651e",
-                subjectArea: "sender",
-                subjectArea:"recipients",
-                subjectArea: "summaryOfBenefits"
-            },
-            sender: {
-                general:{
-                    firstName: "Roger",
-                    middleName: "",
-                    lastName: "Federrer",
-                    prefix: "",
-                    designation: "Ph.D",
-                    suffix: "Sr",
-                    jobTitle: "Architect"
-
-                },
-                contact: {
-                    address: {
-                        addressL1: ">4521 Village Springs Run",
-                        addressL2: "",
-                        addressL3: "",
-                        city: "NewYork",
-                        state: "NY",
-                        zipCode: 50338,
-                        country: "US",
-                        countryCode: 111
-                    },
-                    email: {
-                        "type": "Unknown",
-                        emailAddress: "-"
-                    },
-                    phone: {
-                        "type": "Personal",
-                        intCode: "+11",
-                        areaCode: "00",
-                        phoneNumber: 456789
-
-                    }                 
-                },
-                underwritingCompany: {
-                    underwritingCompanyName: "Life Insurance Company of North America"
-                }
-
-            },
-            recipients: {
-                primaryRecipient:{
-                    general: {
-                        firstName: "Lamar",
-                        middleName: "",
-                        lastName: "Simmons",
-                        prefix: "",
-                        designation: "Ph.D",
-                        suffix: "Jr",
-                        jobTitle: "Architect"
-                    },
-                    "type": "Primary",
-                    companyName: "PFL Test",
-                    contact: {
-                        address: {
-                            addressL1: ">4521 Village Springs Run",
-                            addressL2: "",
-                            addressL3: "",
-                            city: "Atlanta",
-                            state: "GA",
-                            zipCode: 30338,
-                            country: "US",
-                            countryCode: 111
-
-                        },
-                        email: {
-                            "type": "Unknown",
-                            emailAddress: "-"
-                        },
-                        phone: {
-                        "type": "Personal",
-                        intCode: "+11",
-                        areaCode: "00",
-                        phoneNumber: 123456
-                    }
-                    },
-                    channels:
-                    {
-                        localPrint: false,
-                        postal: false,
-                        email: true,
-                        secureEmail: false,
-                        fax: false
-                    }
-                }
-
-            },
-            summaryOfBenefits: {
-                lineOfBusiness: packageResp.Plan map ((planItem , pindex) -> {
-                    productCode: planItem.productType,
-                    logo: null default "-",
-                    rates: {
-                        eeSplitContributionType: null default "None",
-
-                    },
-                    rateModal: {
-                        splitContributionType:  null default "None for all included coverages",
-                        eeSplitContributionType: null default 10
-                    },
-                    "case": {
-                            accountName: null default "Hays Companies"
-                    },
-                    eligibleClass: planItem.EligibilityClass map (eligibilityClsItem , eindex) -> {
-                        locationName: eligibilityClsItem.LocationName,
-                        className: eligibilityClsItem.eligibilityClassName,
-                        classDescription: eligibilityClsItem.eligibilityClassDescription,
-                        //eligibilityWaitingPeriod: eligibilityClsItem.EligibilityWaitingPeriod,
-                        //eligibilityWaitingPeriodDays: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodDays,
-                        //eligibilityWaitingPeriodMonths: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodMonths,
-                        //eligibilityWaitingPeriodOther: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodOther,
-				    	planDesign: eligibilityClsItem.PlanDesign map (pdItem , eindex) ->
-				    		{
-						        eligibilityWaitingPeriod: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriod as String default "After X Days",
-						        eligibilityWaitingPeriodDays: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodDays as String default null,
-						        eligibilityWaitingPeriodMonths: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodMonths as String default "30",
-						        eligibilityWaitingPeriodOther: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodOther as String default "other" ,
-						        depedentCoverage: null default "Spouse or Family",
-						        dependentEligibility: pdItem.DependentEligibilit as String default "Child or Family",				      
-						        domesticPartnerEligible: pdItem.DomesticPartnerEligible as String default "YES",
-						        spouseEligibleWithoutEE: pdItem.Coverage[0].SpouseEligibleWoutEEEnrollment as String default "NO",
-						        dependentChildEligibleWithoutEE: pdItem.Coverage[0].DependentChildEligibleWOutEEEnrollment as String default "NO",
-						        extendedDeathBenefit: pdItem.WaiverOfPremium.ExtendedDeathBenefit.ExtendedDeathBenefit default true,
-						        extendedDeathBenefitMaximumDuration : pdItem.ExtendedDeathBenefit.ExtendedDeathBenefitMaximumDuration default "CR",
-						        waiverOfPremiumDurationAge: pdItem.WaiverOfPremium.WaiverOfPremiumDurationAge as String default '65',
-						        extendedDeathBenefitDisabledBeforeAge: null default "CR",
-						        continuationOfDisabilityDuration: pdItem.WaiverOfPremium.ContinuationOfDisabilityStartingAge as String default '65',
-						        waiverOfPremiumDisabledBeforeAge: pdItem.WaiverOfPremium.WaiverOfPremiumUpToAge as String default '40',
-						        waiverOfPremiumWaitingPeriod: pdItem.WaiverOfPremium.WaiverOfPremiumWaitingPeriod as String default '9',
-						        employeeContributionType: null default null,
-						        flatDollarAmount: pdItem.Coverage[0].flatAmt as String default null, // $ is removed , revisit mapping
-						        waiverOfPremium: pdItem.WaiverOfPremium.WaiverOfPremium as String default null,
-						        continuationOfDisability: pdItem.ContinuationOfDisabilityas as String default null,
-						        matchLifeBenefit: null default null,
-						        coverageEndAtAge: null default null,
-						        coverageEndAtAgeForFullTimeStudent: null default null,
-						        coverageEndAtAgeForNotFullTimeStudent: null default null,
-			        			coverage:  
-			        				{
-									  	benefitType:  pdItem.Coverage map(covItem , i) ->{
-							            //coverage: eligibilityClsItem.PlanDesign[0].Coverage,
-							            coverageType: covItem.coverageType as String default null,
-							            splitContributionType: null default "None for all included coverages",
-							            eeSplitContributionType: covItem.EEContributions default "None",
-							            adAndDRider: covItem.ADDRider default "NO",
-							            //adAndDRiderBenefitPercentage: "",
-							            //adAndDRiderType: "",
-							            LifeCoverageEndsAtAge: covItem.BenefitType.LifeCoverageEndsAtAge default "18",
-							            childBenfitBirthTo14Days: covItem.BenefitType.BirthTo14DaysOld default "1000",
-							            childBenfit14DaysTo6Month: covItem.BenefitType.Days14To6MonthsOld default "1000",
-							            coverageEndAtAgeForFullTimeStudent: null default "1000",
-							            coverageEndAtAgeForNotFullTimeStudent: null default "1000",
-							            benefitType: covItem.BenefitType default "Times Salary",
-							            flatBenefitAmount:{
-							            	flatBenefitAmount1:covItem.BenefitType.FlatBenefitAmount1,
-							            	flatBenefitAmount2:covItem.BenefitType.FlatBenefitAmount2,
-							            	flatBenefitAmount3:covItem.BenefitType.FlatBenefitAmount3,
-							            	flatBenefitAmount4:covItem.BenefitType.FlatBenefitAmount4,
-							            	flatBenefitAmount5:covItem.BenefitType.FlatBenefitAmount5,
-							            	flatBenefitAmount6:covItem.BenefitType.FlatBenefitAmount6,
-							            	flatBenefitAmount7:covItem.BenefitType.FlatBenefitAmount7,
-							            	flatBenefitAmount8:covItem.BenefitType.FlatBenefitAmount8,
-							            	flatBenefitAmount9:covItem.BenefitType.FlatBenefitAmount9,
-							            	flatBenefitAmount10:covItem.BenefitType.FlatBenefitAmount10
-							      
-							            } ,
-							            unitsOf: covItem.UnitsOf default "5",
-							            eeUnitsOf: null default "5",
-							            childUnitsOf: "",
-							            spouseUnitsOf: "",
-							            salaryMultiple:{
-							            	salaryMultiple1:covItem.BenefitType.SalaryMultiple1,
-							            	salaryMultiple2:covItem.BenefitType.SalaryMultiple2,
-							            	salaryMultiple3:covItem.BenefitType.SalaryMultiple3,
-							            	salaryMultiple4:covItem.BenefitType.SalaryMultiple4,
-							            	salaryMultiple5:covItem.BenefitType.SalaryMultiple5,
-							            	salaryMultiple6:covItem.BenefitType.SalaryMultiple6,
-							            	salaryMultiple7:covItem.BenefitType.SalaryMultiple7,
-							            	salaryMultiple8:covItem.BenefitType.SalaryMultiple8,
-							            	salaryMultiple9:covItem.BenefitType.SalaryMultiple9,
-							            	salaryMultiple10:covItem.BenefitType.SalaryMultiple10
-							            },
-							            earningType: covItem.BenefitType.EarningsType default "salary",
-							            benefitMinimum: covItem.BenefitType.BenefitMinimum default "500",
-							            benefitMaximum: covItem.BenefitType.BenefitMaximumPct default "1000",
-							            guarateedIssueAmount: covItem.BenefitType.GuaranteedIssueAmount default "1000",
-							            guarateedIssueTimesSalary: covItem.BenefitType.GuaranteedIssueTimesSalary default "1000",
-							            //coverageEndAtAgeForNotFullTimeStudent: "",
-							            typeOfAnnualEntrollmentIncrease: null default "Benefit Level Increase",
-							            unitsOfIncrease: null default "10",
-							            percentageOfBenefit: null default "15",
-							            percentageBasis: covItem.BenefitType.PercentageBasis default "15",
-							            benefitReductionSchedule: covItem.AgeReductions.BenefitReductionSchedule default "30",
-							            spouseReductionAgeBasis: null default "65",
-							            AcceleratedDeathBenefit: "" default null,
-							            spouseAcceleratedDeathBenefit: covItem.AcceleratedDeathBenefit.SpouseAcceleratedDeathBenefit default "100",
-							            upToPercentage: covItem.AcceleratedDeathBenefit.SpouseAcceleratedDeathBenefit.UpToPctSgn default "20",
-							            dependentEligibility: eligibilityClsItem.PlanDesign[0].DependentEligibility default "Spouse or Family",
-							            extendedDeathBenefit: eligibilityClsItem.PlanDesign[0].ExtendedDeathBenefit.ExtendedDeathBenefit default "true",
-							            adAndDRiderType: null default "NO",
-							            adAndDRiderBenefitPercentage: null default "15",
-							            //seatbelt: null default "",
-							            commonCarrier: null default "YES",
-							            commonCarrierPercentage: null default "10",
-							            commonCarrierMaximum: null default "10000",
-							            feloniousAssault: null default "YES",
-							            feloniousAssaultMaximum: null default "10",
-							            feloniousAssaultPercentage: null default "1000",
-							            seatbeltBenefitPercentage: null default "10",
-							            seatbeltBenefitMaximum: null default "1500",
-							            seatbeltFlatAmount: null default "30000",
-							            combinedTimesSalary: null default "30000",
-							            combinedBenefitMaximum: null default "3000",
-							            employeeBenefitType: "",
-							            employeeTypeOfAnnualEnrollmentIncrease: covItem.BenefitType.TypeOfAnnualEnrollmentIncrease,
-							            employeeUnitsIncrease: "",
-							            spouseBenefitType: "",
-							            spouseTypeOfAnnualEnrollmentIncrease: "",
-							            spouseUnitsIncrease: "",
-							            benefitLevelIncrease: "",
-							            eeBenefitType: "",
-							            eeTypeOfAnnualEnrollmentIncrease: "",
-							            eeBenefitLevelIncrease: "",
-							            spouseBenefitLevelIncrease: "",
-							            flatAmount: "", //revisit mapping
-							            employeeAcceleratedDeathBenefit: "",
-							            percentage: "",
-							            percentageContribution: "",
-							            spouseCompositeRate: "",
-							            childContributionPercentage: "",
-							            employeeCompositeRate: "",
-							            commonCarrierFlatAmount: "",
-							            feloniousAssaultFlatAmount: "",
-							            //acceleratedDeathBenefit: covItem.AcceleratedDeathBenefit,
-							            //coverageEndAtAgeForFullTimeStudent: covItem.BenefitType.FullTimeStudents,
-							            //airbagBenefitPercentage: "",
-							            //airbagFlat: "",
-							            //childAccidentalInjuryFlat: "",
-							            //childDayCareBenefitPercentage: "",
-							            //childDayCareFlat: "",
-							            //comaBenefitPercentage: "",
-							            //commonCarrierBenefitPercentage: "",
-							            //commonCarrierFlat: "",
-							            //commonDualAccidentalBenefit: "",
-							            //commonDualAccidentalFlat: "",
-							            //dependentChildEligibleWithoutEE: "",
-							            //employeeRateBasis: "",
-							            //exposureAndDisapperance: "",
-							            //feloniousAssaultBenefitPercentage: "",
-							            //feloniousAssaultFlat: "",
-							            //matchLifeBenefit: "",
-							           //rehabilitationBenefitPercentage: "",
-							            //rehabilitationFlat: "",
-							            //roundingRule: "",
-							            //SEB1AdditionalBenefitPercentage: "",
-							            //SEB2AdditionalBenefitPercentage: "",
-							            //SEB3ChildAdditionalBenefitPercentage: "",
-							            //spUnitsOf: "",
-							            //spouseEligibleWithoutEEEnrollment: "",
-							            //spouseRetrainingBenefitPercentage: "",
-							            //spouseRetrainingFlat: "",
-							            //survivingSpouseBenefitPercentage: "",
-							            //survivingSpouseFlat: "",
-										//}
-										rounding:
-			         					{
-								            roundingRule: covItem.BenefitType.RoundingRule default "Nearest",
-								            roundingAmount: covItem.BenefitType.RoundingAmount default "500",
-								            roundingRuleAppliesTo: covItem.BenefitType.RoundingRuleAppliesTo default "Guaranteed issue"
-								        }
-				        			 },// End of BenefitType
-							        
-								    plan: 
-								    	{
-								            situsState: if(planItem.situsState != null) planItem.situsState else opportunityResp.CovPolicyNumber.CovPolicyNumberEntry[0].situsState,
-											product: planItem.CovPolicyNumber.CovPolicyNumberEntry[0].PolicySymbol,
-								            waiverOfPremiumDisabledBeforeAge: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.WaiverOfPremiumUpToAge as String default "40",
-								            waiverOfPremiumDuration: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.WaiverOfPremiumDuration as String default "To Age" ,
-								            waiverOfPremiumDurationAge: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.WaiverOfPremiumDurationAge as String default "65",
-								            waiverOfPremiumWaitingPeriod: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.WaiverOfPremiumWaitingPeriod as String default "9",
-								            creationDate: if(packageResp.createDate != null) packageResp.createDate else opportunityResp.createDate as String default "",
-								            continuationOfDisabilityStartingAge: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.ContinuationOfDisabilityStartingAge as String default "60",
-								            continuationOfDisabilityDuration: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.ContinuationOfDisabilityDuration as String default "75",
-								            continuationOfDisabilityDurationMonths: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.ContinuationOfDisabilityDurationMonths as String default "08",
-								            extendedDeathBenefit: eligibilityClsItem.PlanDesign[0].ExtendedDeathBenefit[0].ExtendedDeathBenefit as String default "true",
-								            portabilityEligibility: eligibilityClsItem.PlanDesign[0].ConversionAndPortability[0].PortabilityEligibility as String default "Employee",
-								            portabilityDuration: eligibilityClsItem.PlanDesign[0].ConversionAndPortability.PortabilityDuration as String default "",
-								            portabilityDurationAge: eligibilityClsItem.PlanDesign[0].ConversionAndPortability.portabilityDurationAge as String default "35",
-								            portabilityDurationYears: eligibilityClsItem.PlanDesign[0].ConversionAndPortability.portabilityDurationYears as String default "10",
-								            conversionNoOfDaysToApply: eligibilityClsItem.PlanDesign[0].ConversionAndPortability[0].ConversionNumberOfDaysToApply as String default "31",
-											policyNumber: opportunityResp.CovPolicyNumber.CovPolicyNumberEntry[0].PolicyNumber,
-											documentSubclass: null as String default "",
-											documentGenerationDate: null as String default "01/01/2022",
-											waiverOfPremium: eligibilityClsItem.PlanDesign[0].WaiverOfPremium.WaiverOfPremium as String default "",
-											continuationOfDisability : eligibilityClsItem.PlanDesign[0].ContinuationOfDisability as String default "",
-											//vaddPolicyNumber: "",
-											//volLifePolicyNumber: "",
-										},  // End of Plan
-									rateStructure: 
-										{
-								            benefitType: eligibilityClsItem.PlanDesign[0].Coverage[0].BenefitType.BenefitType,
-								            compositeRate: eligibilityClsItem.CompositeRateInd as String default  "1500",
-								            spouseRateBasis: null as String default "20",            
-								            ageBandApplies: eligibilityClsItem.PlanDesign[0].Coverage[0].RateStructureGroup.AgeBandApplies as String default "checked",
-								            smokerStatusApplies: eligibilityClsItem.PlanDesign[0].Coverage[0].RateStructureGroup.SmokerStatusApplies as String default "unchecked",
-											UnismokerRates: null as String default "",				
-											payrollFrequency: opportunityResp.PayrollFrequency as String default "Monthly",
-											pasteFromSpreadSheet: null as String default "NO",
-											spouseContributionType: null as String default "None",
-											spouseContributionPercentage: null as String default "None",
-											contributionTypePercentage: null as String default "10",
-											contributionTypeFlat: null as String default "Flat",
-											childRateBasis: null as String default "",
-											childContributionType: null as String default "",
-											familyRateBasis: null as String default "",
-											familyContributionType: null as String default "",
-											employeeContributionType: null as String default "",
-											employeeRateBasis: null as String default "",
-											eeSmokerRates: null as String default "",
-											eeNonSmokerRates: null as String default "",
-											contributionType: null as String default "",
-											percentage: null as String default "",
-											percentageContribution: null as String default "",
-											//spouseCompositeRate: "",
-											//flatContribution: "",
-											childContributionPercentage: null as String default "",
-											familyCompositeRate: "",
-											employeeContributionPercentage: null as String default "",
-											familyContributionPercentage: null as String default "",
-											employeeCompositeRate: null as String default "",
-											//eeContributionType: "",
-											//eechContributionType: "",
-											//eespContributionType: "",
-											//eechRateBasis: "",
-											//eespRateBasis: "",
-											//employeeContributionPercentage: "",
-											//familyContributionPercentage: "",
-							        	} // ***************End of Rate Structure *****************
-				        }// ********************** End of Coverage ***********************
-        	
-        
-			
-        } // ************************ End of Plan Design ********************
-
-}, // ************END OF ELIGIBLE CLASS *********************
-       				add_covered_losses_modal: 
-       				{
-			        	addCoveredLosses: "",
-			        	coveredLossBenefitPercentage: ""	
-			        },
-        			plan_summary: 
-        			{
-        				product: planItem.CovPolicyNumber.CovPolicyNumberEntry[0].Product
-        	
-        			},
-        			copyRights: ""
-
-    })
+        transaction:
+        {
+        	document: 
+        		{
+	                templateName: "NYL FJA Master Document",
+	                templateID: 159141617,
+	                form: "",
+	                brochure: "",
+	                attachmentID: "",
+	                inclReturnEnvelope: false,
+	                defaultRecipientRole: "",
+	                recipient: "",
+	                ccRecipient: "",
+	                isSTP: true,
+	                xmlString: "",
+	                transactGUID: vars.transactGuid,
+	                benefitCaseId: "",
+	                subjectArea: "sender",
+	                subjectArea:"recipients",
+	                subjectArea: "fja",
+	                recipientType: "",
+	                primaryRecipientindex: "",
+	                ccRecipientindex: "",
+	                isRCUtility: false,
+	                senderId: "FJAStraightThrough",
+	                //userId: "FJAStraightThrough",
+	                corrDocType: "FJAEnrollmentMaterial",
+	                triggerName: "FJA Report"
+            	},
+            notificationData: "",
+            sender: 
+            	{
+	                general: 
+	                	{
+		                    firstName: "Roger",
+		                    middleName: "",
+		                    lastName: "Federrer",
+		                    prefix: "",
+		                    prefixNew: "",
+		                    designation: "Ph.D",
+		                    suffix: "Sr",
+		                    jobTitle: "Architect"
+	                	},
+	                contact: 
+	                	{
+	                    	address: 
+	                    		{
+			                        addressL1: ">4521 Village Springs Run",
+			                        addressL2: "",
+			                        addressL3: "",
+			                        city: "NewYork",
+			                        state: "NY",
+			                        zipCode: 50338,
+			                        country: "US",
+			                        countryCode: 111
+	                    		},
+	                    	email: 
+	                    		{
+	                        		"type": "Unknown",
+	                        		emailAddress: "-"
+	                    		},
+	                    	fax: "",
+	                    	phone: 
+	                    		{
+			                        "type": "Personal",
+			                        intCode: "+11",
+			                        areaCode: "00",
+			                        phoneNumber: 456789,
+			                        extension: "+11"
+	                    		}                 
+                		},
+                	claimOffice:
+	                	{
+	                		address: 
+		                		{
+			                        addressL1: ">4521 Village Springs Run",
+			                        addressL2: "",
+			                        addressL3: "",
+			                        city: "NewYork",
+			                        state: "NY",
+			                        zipCode: 50338,
+			                        country: "US",
+			                        countryCode: 111
+		                    	},
+	                    	phone: 
+			                    {
+			                        "type": "Personal",
+			                        intCode: "+11",
+			                        areaCode: "00",
+			                        phoneNumber: 456789,
+			                        extension: "+11"
+			                    },
+	                    	fax: ""
+	                },
+                	teamLeader: "",
+                	vocationalResc: "",
+	                underwritingCompany: 
+	                	{
+	                    	underwritingCompanyName: "Life Insurance Company of North America"
+	                	}
+            	},
+            recipients: 
+	            {
+	                primaryRecipient: 
+		                { 
+		                    general:  
+			                    {  
+			                        firstName: "Lamar",
+			                        middleName: "",
+			                        lastName: "Simmons",
+			                        prefix: "",
+			                        designation: "Ph.D",
+			                        suffix: "Jr",
+			                        jobTitle: "Architect" 
+			                    },
+		                    ccAttachSelected: false,
+		                    "type": "Primary",
+		                    companyName: "PFL Test",
+		                    contact: 
+		                    	{ 
+			                        address: 
+			                        	{
+				                            addressL1: ">4521 Village Springs Run",
+				                            addressL2: "",
+				                            addressL3: "",
+				                            city: "Atlanta",
+				                            state: "GA",
+				                            zipCode: 30338,
+				                            country: "US",
+				                            countryCode: 111
+			                        	},
+		                        	email: 
+				                        {
+				                            "type": "Unknown",
+				                            emailAddress: "-"
+				                        },
+		                        	fax: "",
+		                        	phone: 
+			                        	{
+					                        "type": "Personal",
+					                        intCode: "+11",
+					                        areaCode: "00",
+					                        phoneNumber: 123456,
+					                        extension: 91
+			                    		}
+		                    	},
+		                    channels:
+		                    	{
+			                        localPrint: false,
+			                        postal: false,
+			                        email: true,
+			                        secureEmail: false,
+			                        fax: false
+		                    	}
+		                },
+					ccRecipient: "",
+					ccString: "",
+					useSecureEmail: false,
+					skipArchive: false
+	            },            
+            fja: 
+            	{
+           			metadata:
+           				{
+			            	documentSubclass: "FJAEnrollmentMaterial",
+			            	opportunityId: opportunityResp.opportunityId,
+			            	packageId: packageResp.packageId,
+			            	fjaRequestId: vars.transactGuid,
+			            	userId: "FJAStraightThrough"
+			            },
+			        assembledTransaction:
+			        	{
+			        		compositeTransaction: 
+			        			{
+			        				fjaDocument: 
+			        					{
+			        						templateName: "Benefit Summary Report",
+			        						templateID: 159124182
+			        					},
+			        				summaryOfBenefits: 
+			        					{
+			        						lineOfBusiness: packageResp.Plan map ((planItem , pindex) -> {
+			        							productCode: planItem.productType,
+							                    rates: 
+								                    {
+								                        eeSplitContributionType: "", // NM
+								                    },
+								                rateModal: 
+								                	{
+								                        splitContributionType:  "", //NM
+								                        eeSplitContributionType: "" //NM
+                    								},
+                    							"case": 
+                    								{
+                            							accountName: opportunityResp.Role[0].Name // NM 
+                    								},
+                    							plan: 
+                    								{
+								                    	situsState: if(planItem.situsState == null) opportunityResp.CovPolicyNumber.CovPolicyNumberEntry[0].situsState else planItem.situsState,
+								                    	product: checkProduct(planItem.productType),
+								                    	creationDate: if(packageResp.createDate == null) (opportunityResp.createDate as Number / 1000) as DateTime as String {format:"ddMMyyyy"} else (opportunityResp.createDate as Number / 1000) as DateTime as String {format:"ddMMyyyy"},
+								                    	policyNumber: opportunityResp.CovPolicyNumber.CovPolicyNumberEntry[0].PolicySymbolAndNumber,
+								                    	documentGenerationDate: "", //NM
+								                    	vaddPolicyNumber: "", //NM
+								                    	volLifePolicyNumber: "", //NM
+								                    	productVTLPolicyNumber: "", //NM,
+                    									eligibleClass: planItem.EligibilityClass map (eligibilityClsItem , eindex) -> {
+								                        	locationName: eligibilityClsItem.LocationName,
+								                        	className: eligibilityClsItem.eligibilityClassName,
+								                        	classDescription: eligibilityClsItem.eligibilityClassDescription,
+								                        	eligibilityWaitingPeriod: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriod,
+								                        	eligibilityWaitingPeriodDays: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodDays,
+								                        	eligibilityWaitingPeriodMonths: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodMonths,
+								                        	eligibilityWaitingPeriodOther: eligibilityClsItem.EligibilityWaitingPeriod.EligibilityWaitingPeriodOther,
+												    		planDesign: eligibilityClsItem.PlanDesign map (pdItem , eindex) -> {												    				
+												    			portabilityEligibility: pdItem.ConversionAndPortability.PortabilityEligibility as String,
+								                    			portabilityDuration: pdItem.ConversionAndPortability.PortabilityDuration,
+								                    			portabilityDurationAge: pdItem.ConversionAndPortability.PortabilityDurationAge,
+								                    			portabilityDurationYears: pdItem.ConversionAndPortability.PortabilityDurationYears,
+								                    			ConversionNumberOfDaysToApply: pdItem.ConversionAndPortability.ConversionNumberOfDaysToApply,
+								                    			dependentCoverage: "", //NM
+															    dependentEligibility: pdItem.DependentEligibility,				      
+															    domesticPartnerEligible: pdItem.DomesticPartnerEligible ,
+															    extendedDeathBenefit: pdItem.WaiverOfPremium.ExtendedDeathBenefit.ExtendedDeathBenefit,
+															    extendedDeathBenefitMaximumDuration: pdItem.WaiverOfPremium.ExtendedDeathBenefit.ExtendedDeathBenefitMaximumDuration,
+															    WaiverOfPremiumDuration: pdItem.WaiverOfPremium.WaiverOfPremiumDuration,
+															    waiverOfPremiumDurationAge: pdItem.WaiverOfPremium.WaiverOfPremiumDurationAge,
+															    extendedDeathBenefitDisabledBeforeAge: pdItem.WaiverOfPremium.ExtendedDeathBenefit.ExtendedDeathBenefitUpToAge,	//Corrected as per QE
+															    continuationOfDisabilityDuration: pdItem.ContinuationOfDisability.ContinuationOfDisabilityDuration,
+															    continuationOfDisabilityStartingAge: pdItem.ContinuationOfDisability.ContinuationOfDisabilityStartingAge,
+															    continuationOfDisabilityDurationMonths: pdItem.ContinuationOfDisability.ContinuationOfDisabilityDurationMonths,
+															    waiverOfPremiumDisabledBeforeAge: pdItem.WaiverOfPremium.WaiverOfPremiumUpToAge,
+															    waiverOfPremiumWaitingPeriod: pdItem.WaiverOfPremium.WaiverOfPremiumWaitingPeriod,
+															    waiverOfPremium: pdItem.WaiverOfPremium.WaiverOfPremium, //Its the Parent Node,
+															    continuationOfDisability: pdItem.ContinuationOfDisability.ContinuationOfDisability, // Not sure of ContinuationOfDisability element in response.
+															    addCoveredLosses: "",	//NM
+															    coveredLossBenefitPercentage: "",	//NM
+															    addBenefitPercentage: "",	//NM
+															    addTypes: 
+															    	{
+																		addType1: pdItem.ADDType,
+																		addType2: pdItem.ADDType,
+																	    addType3: pdItem.ADDType,
+																	    addType4: pdItem.ADDType,
+																	    addType5: pdItem.ADDType,
+																	    addType6: pdItem.ADDType,
+																	    addType7: pdItem.ADDType,
+																	    addType8: pdItem.ADDType,
+																	    addType9: pdItem.ADDType,
+																	    addType10: pdItem.ADDType,		
+											        				},
+											        			coverage:  
+			        												{
+																	  	benefitType:  pdItem.Coverage map(covItem , i) ->{
+																	  		coverage: checkCoverageType(covItem.coverageType),
+															            	coverageType: checkCoverageType(covItem.coverageType) ,
+															            	splitContributionType: "",	//NM
+															            	eeSplitContributionType: "", //NM
+															            	adAndDRider: covItem.ADDRider,
+															            	LifeCoverageEndsAtAge: covItem.BenefitType.LifeCoverageEndsAtAge,
+															            	childBenfitBirthTo14Days: covItem.BenefitType.BirthTo14DaysOld,
+															            	childBenfit14DaysTo6Month: covItem.BenefitType.Days14To6MonthsOld,
+															            	coverageEndAtAgeForFullTimeStudent: covItem.BenefitType.FullTimeStudents,	
+															            	coverageEndAtAgeForNotFullTimeStudent: covItem.BenefitType.NonFullTimeStudents,
+															            	benefitType: covItem.BenefitType.BenefitType,
+															            	flatBenAmount: covItem.BenefitType.FlatBenAmt,
+															            	flatBenefitAmount:
+															            		{
+																            		flatBenefitAmount1:covItem.BenefitType.FlatBenefitAmount1,
+																            		flatBenefitAmount2:covItem.BenefitType.FlatBenefitAmount2,
+																            		flatBenefitAmount3:covItem.BenefitType.FlatBenefitAmount3,
+																            		flatBenefitAmount4:covItem.BenefitType.FlatBenefitAmount4,
+																            		flatBenefitAmount5:covItem.BenefitType.FlatBenefitAmount5,
+																            		flatBenefitAmount6:covItem.BenefitType.FlatBenefitAmount6,
+																            		flatBenefitAmount7:covItem.BenefitType.FlatBenefitAmount7,
+																            		flatBenefitAmount8:covItem.BenefitType.FlatBenefitAmount8,
+																            		flatBenefitAmount9:covItem.BenefitType.FlatBenefitAmount9,
+																            		flatBenefitAmount10:covItem.BenefitType.FlatBenefitAmount10
+															            		} ,
+															            	unitsOf: covItem.BenefitType.UnitsOf,
+															            	eeUnitsOf: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.UnitsOf else "",	//NM
+															            	childUnitsOf: if(covItem.coverageType == "CH" or capitalize(covItem.coverageType) == "Child") covItem.BenefitType.UnitsOf else "",	//NM
+															            	spouseUnitsOf: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.UnitsOf else "" ,	//NM
+															            	salaryMultiple:
+															            		{
+																            		salaryMultiple1:covItem.BenefitType.SalaryMultiple1,
+																            		salaryMultiple2:covItem.BenefitType.SalaryMultiple2,
+																            		salaryMultiple3:covItem.BenefitType.SalaryMultiple3,
+																            		salaryMultiple4:covItem.BenefitType.SalaryMultiple4,
+																            		salaryMultiple5:covItem.BenefitType.SalaryMultiple5,
+																            		salaryMultiple6:covItem.BenefitType.SalaryMultiple6,
+																            		salaryMultiple7:covItem.BenefitType.SalaryMultiple7,
+																            		salaryMultiple8:covItem.BenefitType.SalaryMultiple8,
+																            		salaryMultiple9:covItem.BenefitType.SalaryMultiple9,
+																            		salaryMultiple10:covItem.BenefitType.SalaryMultiple10
+															            		},
+																            earningType: covItem.BenefitType.EarningsType,
+																            benefitMinimum: covItem.BenefitType.BenefitMinimum,
+																            benefitMaximum: covItem.BenefitType.BenefitMaximum,
+																            guarateedIssueAmount: covItem.BenefitType.GuaranteedIssueAmount,
+																            guarateedIssueTimesSalary: covItem.BenefitType.GuaranteedIssueTimesSalary,
+																            typeOfAnnualEnrollmentIncrease: covItem.BenefitType.TypeOfAnnualEnrollmentIncrease,
+																            unitsOfIncrease: covItem.BenefitType.UnitsIncrease,	
+																            percentageOfBenefit: covItem.BenefitType.PercentOfBenefit,
+																            percentageBasis: covItem.BenefitType.PercentageBasis,
+																            benefitReductionSchedule: covItem.AgeReductions.BenefitReductionSchedule,
+																            spouseReductionAgeBasis: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.AgeReductions.ReductionBasis else "",
+																            AcceleratedDeathBenefit: covItem.AcceleratedDeathBenefit.AcceleratedDeathBenefit,	
+																            acceleratedDeathBenefitMaximum: covItem.AcceleratedDeathBenefit.BenefitMaximum,
+																            spouseAcceleratedDeathBenefit: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.AcceleratedDeathBenefit.AcceleratedDeathBenefit else "",
+																            childAcceleratedDeathBenefit: if(covItem.coverageType == "CH" or capitalize(covItem.coverageType) == "Child") covItem.AcceleratedDeathBenefit.AcceleratedDeathBenefit else "",
+																            upToPercentage: covItem.AcceleratedDeathBenefit.UpToPctSgn,								            
+																            benefitMaxTimesSalaryMultiple: covItem.BenefitType.BenefitMaxTimesSalaryMultiple,
+																            adAndDRiderType: "",
+																            adAndDRiderBenefitPercentage: "",
+																            seatbelt: "",
+																            commonCarrier: "",
+																            commonCarrierPercentage: "",
+																            commonCarrierMaximum: "",
+																            feloniousAssault: "",
+																            feloniousAssaultMaximum: "",
+																            feloniousAssaultPercentage: "",
+																            seatbeltBenefitPercentage: "",
+																            seatbeltBenefitMaximum: "",
+																            seatbeltFlatAmount: "",
+																            combinedTimesSalary: covItem.BenefitType.CombinedTimesSalary,
+																            combinedBenefitMaximum: covItem.BenefitType.CombinedMaximumFlat,
+																            employeeBenefitType: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.BenefitType else "",
+																            employeeTypeOfAnnualEnrollmentIncrease: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.TypeOfAnnualEnrollmentIncrease else "",
+																            employeeUnitsIncrease: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.UnitsIncrease else "",
+																            spouseBenefitType: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.BenefitType else "",
+																            spouseTypeOfAnnualEnrollmentIncrease: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.TypeOfAnnualEnrollmentIncrease else "",
+																            spouseUnitsIncrease: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.UnitsIncrease else "",
+																            benefitLevelIncrease: covItem.BenefitType.BenefitLevelIncrease,
+																            eeBenefitType: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.BenefitType else "",
+																            eeTypeOfAnnualEnrollmentIncrease: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.TypeOfAnnualEnrollmentIncrease else "",
+																            eeBenefitLevelIncrease: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.BenefitType.BenefitLevelIncrease else "",
+																            spouseBenefitLevelIncrease: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.BenefitLevelIncrease else "",
+																            flatDollarAmount: covItem.AcceleratedDeathBenefit.FlatDlrSignAmount,
+																            spFlatDollarAmount: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.AcceleratedDeathBenefit.FlatDlrSignAmount else "",
+																            EEFlatDollarAmount: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.AcceleratedDeathBenefit.FlatDlrSignAmount else "",
+																            employeeAcceleratedDeathBenefit: if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.AcceleratedDeathBenefit.AcceleratedDeathBenefit else "",
+																            //percentage: "", Not Needed
+																            //percentageContribution: "", Not Needed
+																            spouseCompositeRate: "",
+																            employeeCompositeRate: "",
+																            childContributionPercentage: "", // Already Present in RS
+																            commonCarrierFlatAmount: "",
+																            feloniousAssaultFlatAmount: "",
+																            airbagBenefitPercentage: "",
+																            airbagFlat: "",
+																            childAccidentalInjuryFlat: "",
+																            childDayCareBenefitPercentage: "",
+																            childDayCareFlat: "",
+																            comaBenefitPercentage: "",
+																            commonCarrierBenefitPercentage: "",
+																            commonCarrierFlat: "",
+																            commonDualAccidentalBenefit: "",
+																            commonDualAccidentalFlat: "",
+																            dependentChildEligibleWithoutEE: covItem.DependentChildEligibleWOutEEEnrollment,
+																            exposureAndDisapperance: "",
+																            feloniousAssaultBenefitPercentage: "",
+																            feloniousAssaultFlat: "",
+																            matchLifeBenefit: "",
+																            rehabilitationBenefitPercentage: "",
+																            rehabilitationFlat: "",
+																            SEB1AdditionalBenefitPercentage: "",
+																            SEB2AdditionalBenefitPercentage: "",
+																            SEB3ChildAdditionalBenefitPercentage: "",
+																            spUnitsOf: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.UnitsOf else "",
+																            spouseEligibleWithoutEEEnrollment: covItem.SpouseEligibleWoutEEEnrollment,
+																            spouseRetrainingBenefitPercentage: "",
+																            spouseRetrainingFlat: "",
+																            survivingSpouseBenefitPercentage: "",
+																            survivingSpouseFlat: "",
+																            airbagBenefitMaximum: "",
+																            enhancedOption1Percentage: "",
+																            enhancedOption2Percentage: "",
+																            enhancedOption1BenefitMaximum: "",
+																            enhancedOption2BenefitMaximum: "",
+																            traditionalOptionWithChildrenPercentage: "",
+																            traditionalOptionWithNoChildPercentage: "",
+																            traditionalOptionWithSpousePercentage: "",
+																            spouseBenefitMaximum: if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.BenefitType.BenefitMaximum else "",
+																            SEB1AdditionalBenefitMax: "",
+																            SEB1NumberOfYears: "",
+																            SEB1NoQualifyingChildDollars: "",
+																            SEB1ChildUnderAge: "",
+																            SEB2AdditionalBenefitMax: "",
+																            SEB2NumberOfYears: "",
+																            SEB2NoQualifyingChildDollars: "",
+																            SEB2ChildUnderAge: "",
+																            rehabilitationBenefitMaximum: "",
+																            childDayCareChildAge: "",
+																            childDayCareBenefitMaximum: "",
+																            childDayCareChildYears: "",
+																            spouseRetrainingBenefitMaximum: "",
+																            feloniousAssaultBenefitMaximum: "",
+																            survivingSpouseBenefitMaximum: "",
+																            survivingSpouseMonths: "",
+																            commonDualAccidentBenefitPercentage: "",
+																            commonDualAccidentBenefitMaximum: "",
+																            commonDualAccidentFlat: "",
+																            employeePerUnitRate: "",
+																            employeeSplitPercentageContributionPerPaycheckUnitRate: "",
+																            employeePerPaycheckPerThousandRate: "",
+																            spousePerUnitRate: "",
+																            spouseSplitPercentageContributionPerPaycheckUnitRate: "",
+																            childPerUnitRate: "",
+																            childSplitPercentageContributionPerPaycheckUnitRate: "",
+																            voluntaryMaximumCombinedWithBasicMaximum: covItem.BenefitType.VoluntaryMaximumCombinedWithBasicMaximum,
+																            voluntaryGICombinedWithBasicGI: covItem.BenefitType.VoluntaryGICombinedWithBasicGI, 
+																            //payrollFrequency: "",		// It should be in rate Structure Group Plan
+																			rateStructure: planItem.RateStructureGroupPlan map (rsItem , rsindex) ->  
+																				{
+																		            spouseCompositeRate: "",
+																		            familyCompositeRate: "",
+																		            employeeCompositeRate: "", 
+																		            spouseRateBasis: rsItem.RateStructureGroupSpouse.SpouseRateBasis, //if(covItem.coverageType == "SPS" or capitalize(covItem.coverageType) == "Spouse") covItem.RateStructureGroup.RateBasis  else "",            
+																		            ageBandApplies: covItem.RateStructureGroup.AgeBandApplies,
+																		            smokerStatusApplies: covItem.RateStructureGroup.SmokerStatusApplies,
+																					UnismokerRates: "",				
+																					pasteFromSpreadSheet: "",
+																					spouseContributionType: rsItem.RateStructureGroupSpouse.SpouseContributionType,
+																					spouseContributionPercentage: rsItem.RateStructureGroupSpouse.ContributionTypePercentage,
+																					contributionTypePercentage: "",
+																					//contributionTypeFlat: "", Not Needed
+																					employeeContributionTypeFlatAmount: rsItem.RateStructureGroupEmployee.ContributionTypeFlatAmount,
+																					childRateBasis: rsItem.RateStructureGroupCHorFAM.ChildRateBasis, //if(covItem.coverageType == "CH" or capitalize(covItem.coverageType) == "Child") covItem.RateStructureGroup.RateBasis  else "",
+																					childContributionType: rsItem.RateStructureGroupCHorFAM.ChildContributionType,
+																					spouseContributionTypeFlatAmount: rsItem.RateStructureGroupSpouse.ContributionTypeFlatAmount,
+																					childContributionTypeFlatAmount: rsItem.RateStructureGroupCHorFAM.ContributionTypeFlatAmount,
+																					familyContributionTypeFlatAmount: rsItem.RateStructureGroupCHorFAM.ContributionTypeFlatAmount,
+																					familyRateBasis: rsItem.RateStructureGroupCHorFAM.FamilyRateBasis,
+																					familyContributionType: rsItem.RateStructureGroupCHorFAM.FamilyContributionType,
+																					employeeRateBasis: rsItem.RateStructureGroupEmployee.EmployeeRateBasis, //if(covItem.coverageType == "EE" or capitalize(covItem.coverageType) == "Employee") covItem.RateStructureGroup.RateBasis else "",
+																					eeSmokerRates: "",
+																					eeNonSmokerRates: "",
+																					contributionType: "",
+																					percentage: "",
+																					employeeRate: rsItem.RateStructureGroupEmployee.EmployeeRate,
+																					spouseRate: rsItem.RateStructureGroupSpouse.SpouseRate,
+																					familyRate: rsItem.RateStructureGroupCHorFAM.FamilyRate,
+																					childRate: rsItem.RateStructureGroupCHorFAM.ChildRate,
+																					EECHRate: rsItem.RateStructureGroupCHorFAM.EECHRate,
+																					EESPRate: rsItem.RateStructureGroupCHorFAM.EESPRate,
+																					//percentageContribution: "", Not Needed
+																					childContributionPercentage: rsItem.RateStructureGroupCHorFAM.ContributionTypePercentage,
+																					eeContributionType: rsItem.RateStructureGroupEmployee.EmployeeContributionType,
+																					eespContributionType: rsItem.RateStructureGroupCHorFAM.EESPContribution,
+																					eechContributionType: rsItem.RateStructureGroupCHorFAM.EECHContribution,
+																					employeeContributionPercentage: rsItem.RateStructureGroupEmployee.ContributionTypePercentage,
+																					familyContributionPercentage: rsItem.RateStructureGroupCHorFAM.ContributionTypePercentage,
+																					eechRateBasis: rsItem.RateStructureGroupCHorFAM.EECHRateBasis,
+																					eespRateBasis: rsItem.RateStructureGroupCHorFAM.EESPRateBasis,
+																					employeeSplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					employeeSplitContributionPercentagePerPaycheckPerTenThousandRate: "",
+																					employeePerPaycheckPerTenThousandRate: "",
+																					spousePerPaycheckPerThousandRate: "",
+																					spousePerPaycheckPerFiveThousandRate: "",
+																					spouseSplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					spouseSplitContributionPercentagePerPaycheckPerFiveThousandRate: "",
+																					childPerPaycheckPerThousandRate: "",
+																					childPerPaycheckPerTwoThousandRate: "",
+																					childSplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					childSplitContributionPercentagePerPaycheckPerTwoThousandRate: "",
+																					employeePerPayFlatContribution: "",
+																					spousePerPayFlatContribution: "",
+																					familyPerPayFlatContribution: "",
+																					eespPerPayFlatContribution: "",
+																					eechPerPayFlatContribution: "",
+																					eespPerPaycheckPerThousandRate: "",
+																					eespSplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					eechPerPaycheckPerThousandRate: "",
+																					eechSplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					familyPerPaycheckPerThousandRate: "",
+																					familySplitContributionPercentagePerPaycheckPerThousandRate: "",
+																					smokerRates: {
+																					smokerRate: if(covItem.RateStructureGroup.RateStructure[0].Smoker == "Smoker") 
+																					covItem.RateStructureGroup.RateStructure[0].RateStructureEntry map(sItem , sIndex) -> {
+																						ageFrom: sItem.AgeFrom,
+																						ageTo:sItem.AgeTo,
+																						billedRate: sItem.BilledRate,
+																						billedVolume: sItem.BilledVolume,
+																						billedPremium: sItem.BilledPremium,
+																						name: "",
+																						familyRate: "",
+																						rateStructureEntryFlatBenAmt: ""
+																						
+																					}	else ""
+																					
+																					},
+																					nonSmokerRates:
+																					{
+																					nonSmokerRate: if(covItem.RateStructureGroup.RateStructure[0].Smoker == "Non Smoker") 
+																					covItem.RateStructureGroup.RateStructure[0].RateStructureEntry map(nsItem , sIndex) -> {
+																						ageFrom: nsItem.AgeFrom,
+																						ageTo:nsItem.AgeTo,
+																						billedRate: nsItem.BilledRate,
+																						billedVolume: nsItem.BilledVolume,
+																						billedPremium: nsItem.BilledPremium,
+																						name: "",
+																						familyRate: "",
+																						rateStructureEntryFlatBenAmt: ""
+																						
+																					}	else if(covItem.RateStructureGroup.RateStructure[1].Smoker == "Non Smoker") 
+																					covItem.RateStructureGroup.RateStructure[1].RateStructureEntry map(nsItem , sIndex) -> {
+																						ageFrom: nsItem.AgeFrom,
+																						ageTo:nsItem.AgeTo,
+																						billedRate: nsItem.BilledRate,
+																						billedVolume: nsItem.BilledVolume,
+																						billedPremium: nsItem.BilledPremium,
+																						name: "",
+																						familyRate: "",
+																						rateStructureEntryFlatBenAmt: ""
+																						
+																					} else ""
+																					
+																					} 										
+															        			}, // ***************End of Rate Structure *****************							        	
+														        		rounding:
+											         						{
+																            	roundingRule: covItem.BenefitType.RoundingRule,
+																            	roundingAmount: covItem.BenefitType.RoundingAmount ,
+																            	roundingRuleAppliesTo: covItem.BenefitType.RoundingRuleAppliesTo
+																        	}
+											        					}	// End of BenefitType
+							        	      						}	//End of Coverage
+							        	      					}	// End of Plan Design
+							        	      				},	// End of Eligible Class
+							        	      			rateStructureGroupPlan: planItem.RateStructureGroupPlan map (rsGrpItem , rsindex) ->  
+								       						{
+											        			employeeContributionType: rsGrpItem.RateStructureGroupEmployee.EmployeeContributionType,
+											        			employeeRateBasis: rsGrpItem.RateStructureGroupEmployee.EmployeeRateBasis ,
+											        			payrollFrequency: rsGrpItem.RateStructureGroupEmployee.PayrollFrequency,
+											        			selectedPlanDesignsForRateStructureGroupPlan: rsGrpItem.selectedPlanDesigns,
+											        			contributionTypeFlat: rsGrpItem.RateStructureGroupEmployee.ContributionTypeFlatAmount,
+											        			contributionTypePercentage: rsGrpItem.RateStructureGroupEmployee.ContributionTypePercentage,
+											        			employeeRate: rsGrpItem.RateStructureGroupEmployee.EmployeeRate,			        			
+											        			employeeRateBasis: rsGrpItem.RateStructureGroupEmployee.EmployeeRateBasis,
+											        			isOtherpayrollFrequency:rsGrpItem.RateStructureGroupEmployee.Other,
+											        			smokerRates: {
+																					smokerRate: if(rsGrpItem.RateStructureGroupEmployee.RateStructure[0].Smoker == "Smoker") 
+																					rsGrpItem.RateStructureGroupEmployee.RateStructure[0].RateStructureEntry map(sItem , sIndex) -> {
+																						ageFrom: sItem.AgeFrom,
+																						ageTo:"",
+																						billedRate: sItem.BilledRate,
+																						billedVolume: "",//sItem.BilledVolume,
+																						billedPremium: "",//sItem.BilledPremium,
+																						name: sItem.name,
+																						familyRate: sItem.FamilyRate,
+																						rateStructureEntryFlatBenAmt: sItem.FlatBenAmt
+																						
+																					}	else ""
+																					
+																					},
+																					nonSmokerRates:
+																					{
+																					nonSmokerRate: if(rsGrpItem.RateStructureGroupEmployee.RateStructure[0].Smoker == "Non Smoker") 
+																					rsGrpItem.RateStructureGroupEmployee.RateStructure[0].RateStructureEntry map(nsItem , sIndex) -> {
+																						ageFrom: nsItem.AgeFrom,
+																						ageTo:"",
+																						billedRate: nsItem.BilledRate,
+																						billedVolume: "",//sItem.BilledVolume,
+																						billedPremium: "",//sItem.BilledPremium,
+																						name: nsItem.name,
+																						familyRate: nsItem.FamilyRate,
+																						rateStructureEntryFlatBenAmt: nsItem.FlatBenAmt
+																						
+																					}	else if(rsGrpItem.RateStructureGroupEmployee.RateStructure[1].Smoker == "Non Smoker") 
+																					rsGrpItem.RateStructureGroupEmployee.RateStructure[1].RateStructureEntry map(nsItem , sIndex) -> {
+																						ageFrom: nsItem.AgeFrom,
+																						ageTo:"",
+																						billedRate: nsItem.BilledRate,
+																						billedVolume: "",//sItem.BilledVolume,
+																						billedPremium: "",//sItem.BilledPremium,
+																						name: nsItem.name,
+																						familyRate: nsItem.FamilyRate,
+																						rateStructureEntryFlatBenAmt: nsItem.FlatBenAmt
+																						
+																					} else ""
+																					
+																					}
+											        		}
+											        },	// End of Plan 
+											    copyRights: "" //NM                     							
+			        					})	//End of Line of Buisness  
+			        			}	// End of Summary of Benefits 
+			        		}	 // End of compositeTransaction
+			        	}	//End of assembledTransaction 
+		        	},	// End of fja
+			}	// End of transaction 
+	}
 }
-}}}       
