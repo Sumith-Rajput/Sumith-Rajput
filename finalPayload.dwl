@@ -507,48 +507,32 @@ fun checkSmoker(smokerType: String) =
 																					eechSplitContributionPercentagePerPaycheckPerThousandRate: "",
 																					familyPerPaycheckPerThousandRate: "",
 																					familySplitContributionPercentagePerPaycheckPerThousandRate: "",
-																					smokerRates: {
-																					smokerRate: if(covItem.RateStructureGroup.RateStructure[0].Smoker == "Smoker") 
-																					covItem.RateStructureGroup.RateStructure[0].RateStructureEntry map(sItem , sIndex) -> {
+																					smokerRates: covItem.RateStructureGroup.RateStructure map(rsgItem , rsgIndex) ->{
+																					smokerRate:  if(rsgItem.Smoker == "Smoker") rsgItem.RateStructureEntry map(sItem , sIndex) -> {
 																						ageFrom: sItem.AgeFrom,
-																						ageTo:sItem.AgeTo,
+																						ageTo:"",
 																						billedRate: sItem.BilledRate,
-																						billedVolume: sItem.BilledVolume,
-																						billedPremium: sItem.BilledPremium,
-																						name: "",
-																						familyRate: "",
-																						rateStructureEntryFlatBenAmt: ""
-																						
-																					}	else ""
-																					
+																						billedVolume: "",//sItem.BilledVolume,
+																						billedPremium: "",//sItem.BilledPremium,
+																						name: sItem.name,
+																						familyRate: sItem.FamilyRate,
+																						rateStructureEntryFlatBenAmt: sItem.FlatBenAmt	
+																					} 
+																					else "",
 																					},
-																					nonSmokerRates:
-																					{
-																					nonSmokerRate: if(covItem.RateStructureGroup.RateStructure[0].Smoker == "Non Smoker") 
-																					covItem.RateStructureGroup.RateStructure[0].RateStructureEntry map(nsItem , sIndex) -> {
+																					nonSmokerRates: covItem.RateStructureGroup.RateStructure map(rsgItem , rsgIndex) ->{
+																					nonSmokerRate:  if(rsgItem.Smoker == "Non Smoker") rsgItem.RateStructureEntry map(nsItem , sIndex) -> {
 																						ageFrom: nsItem.AgeFrom,
-																						ageTo:nsItem.AgeTo,
+																						ageTo:"",
 																						billedRate: nsItem.BilledRate,
-																						billedVolume: nsItem.BilledVolume,
-																						billedPremium: nsItem.BilledPremium,
-																						name: "",
-																						familyRate: "",
-																						rateStructureEntryFlatBenAmt: ""
-																						
-																					}	else if(covItem.RateStructureGroup.RateStructure[1].Smoker == "Non Smoker") 
-																					covItem.RateStructureGroup.RateStructure[1].RateStructureEntry map(nsItem , sIndex) -> {
-																						ageFrom: nsItem.AgeFrom,
-																						ageTo:nsItem.AgeTo,
-																						billedRate: nsItem.BilledRate,
-																						billedVolume: nsItem.BilledVolume,
-																						billedPremium: nsItem.BilledPremium,
-																						name: "",
-																						familyRate: "",
-																						rateStructureEntryFlatBenAmt: ""
-																						
-																					} else ""
-																					
-																					} 										
+																						billedVolume: "",//nsItem.BilledVolume,
+																						billedPremium: "",//nsItem.BilledPremium,
+																						name: nsItem.name,
+																						familyRate: nsItem.FamilyRate,
+																						rateStructureEntryFlatBenAmt: nsItem.FlatBenAmt	
+																					} 
+																					else "",
+																					},									
 															        			}, // ***************End of Rate Structure *****************							        	
 														        		rounding:
 											         						{
